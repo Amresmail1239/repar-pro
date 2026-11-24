@@ -1,0 +1,21 @@
+{
+  "name": "حاسبة حدود التسليح الإنشائية",
+  "short_name": "Rebar Pro",
+  "description": "أقل وأكبر تسليح للكمرات والبلاطات والأساسات والأعمدة وحوائط القص — ECP 203 • SBC 304 • ACI 318-19",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#070c18",
+  "theme_color": "#0f172a",
+  "dir": "rtl",
+  "lang": "ar",
+  "icons": [
+    {
+      "src": "./icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
