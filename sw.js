@@ -1,34 +1,48 @@
-const CACHE_NAME = 'rebar-pro-v1';
-const ASSETS = ['./', './index.html', './manifest.json', './icon.svg'];
+const CACHE_NAME = 'rebar-pro-v2';
+const ASSETS = [
+  './',
+  './index.html',
+  './manifest.json',
+  './icon.png',
+  './icon.svg'
+];
 
-self.addEventListener('install', (e) => {
-  e.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
+self.addEventListener('install', (event) => {
+  event.waitUntil(
+    caches.open(CACHE_NAME)
+      .then((cache) => cache.addAll(ASSETS))
+      .then(() => self.skipWaiting())
   );
-  self.skipWaiting();
 });
 
-self.addEventListener('activate', (e) => {
-  e.waitUntil(
-    caches.keys().then((keys) =>
-      Promise.all(keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k)))
-    )
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    caches.keys()
+      .then((keys) =>
+        Promise.all(
+          keys
+            .filter((key) => key !== CACHE_NAME)
+            .map((key) => caches.delete(key))
+        )
+      )
+      .then(() => self.clients.claim())
   );
-  self.clients.claim();
 });
 
-self.addEventListener('fetch', (e) => {
-  if (e.request.method !== 'GET') return;
-  e.respondWith(
-    caches.match(e.request).then((cached) => {
-      const networkFetch = fetch(e.request).then((res) => {
-        if (res && res.status === 200) {
-          const clone = res.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(e.request, clone));
+self.addEventListener('fetch', (event) => {
+  if (event.request.method !== 'GET') return;
+
+  event.respondWith(
+    fetch(event.request)
+      .then((response) => {
+        if (response && response.status === 200) {
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
         }
-        return res;
-      }).catch(() => cached);
-      return cached || networkFetch;
-    })
+        return response;
+      })
+      .catch(() =>
+        caches.match(event.request).then((cached) => cached || caches.match('./index.html'))
+      )
   );
 });
